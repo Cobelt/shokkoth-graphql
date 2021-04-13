@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+    graphql:
+        build:
+            context: .
+        ports:
+            - '4000:4000'
+        environment:
+            - MONGO_SERVER=mongodb
+            - MONGO_PORT=27012
+            - PORT=4000
+        networks:
+            - shokkoth-universe
+
+networks:
+    shokkoth-universe:
+        external:
+            name: shokkoth-universe
