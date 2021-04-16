@@ -68,6 +68,7 @@ export const DODGE = 'Fuite'
 export const LOCK = 'Tacle'
 
 export const PROSPECTING = 'Prospection'
+export const PODS = 'Pods'
 
 export const HEALS = 'Soins'
 
@@ -85,6 +86,10 @@ export const WEAPONS_FIRE_STEAL = 'vol Feu'
 export const WEAPONS_WATER_STEAL = 'vol Eau'
 
 export const WEAPONS_HEAL = 'PV rendus'
+
+export const WEAPONS_AP_COST = 'Coût en PA'
+export const WEAPONS_TIMES_PER_ROUND = 'fois par tour'
+export const WEAPONS_RANGE = 'Portée'
 
 export const WEAPONS_CRITICAL = '% Critique (base)'
 export const WEAPONS_NO_CRITICAL = 'Pas de critique possible'
@@ -337,6 +342,11 @@ export const translations = {
         short: 'PP',
         imgUrl: 'prospection.png',
     },
+    PODS: {
+        fr: PODS,
+        short: PODS,
+        imgUrl: 'pods.png',
+    },
     HEALS: {
         fr: HEALS,
         short: HEALS,
@@ -397,6 +407,21 @@ export const translations = {
         short: '(PV rendus)',
         imgUrl: 'pv-rendus.png',
     },
+    WEAPONS_AP_COST: {
+        fr: WEAPONS_AP_COST,
+        short: 'PA',
+        imgUrl: 'PA.png',
+    },
+    WEAPONS_TIMES_PER_ROUND: {
+        fr: WEAPONS_TIMES_PER_ROUND,
+        short: '/tour',
+        imgUrl: 'crit.png',
+    },
+    WEAPONS_CRITICAL: {
+        fr: WEAPONS_CRITICAL,
+        short: '%CC (base)',
+        imgUrl: 'crit.png',
+    },
     WEAPONS_CRITICAL: {
         fr: WEAPONS_CRITICAL,
         short: '%CC (base)',
@@ -418,15 +443,6 @@ export const translations = {
         imgUrl: 'passif.png',
     },
 }
-
-export const ENUM = Object.keys(translations)
-
-export const getKey = stat => findKey(stat, translations)
-export const translate = (stat, lang) => translateType(stat, translations, lang)
-export const populate = stat => translations[findKey(stat, translations)]
-
-export const validateType = (stat, translationName) =>
-    validate(stat, translationName, translations)
 
 // PRIMARY
 export const ESSENTIAL_STATS = [AP, MP, RANGE]
@@ -522,7 +538,7 @@ export const ESCAPE_STATS = [DODGE, LOCK]
 export const AP_MP_PARRY = [AP_PARRY, MP_PARRY]
 export const AP_MP_REDUCTION = [AP_REDUCTION, MP_REDUCTION]
 
-export const OTHERS_SECONDARY = [PROSPECTING, HEALS]
+export const OTHERS_SECONDARY = [PROSPECTING, PODS, HEALS]
 
 export const SECONDARY_STATS = [
     ...ESCAPE_STATS,
@@ -539,6 +555,10 @@ export const STATS = [
 ]
 
 export const WEAPONS_CHARACTERISTICS = [
+    WEAPONS_AP_COST,
+    WEAPONS_RANGE,
+    WEAPONS_TIMES_PER_ROUND,
+
     WEAPONS_NEUTRAL_DAMAGES,
     WEAPONS_EARTH_DAMAGES,
     WEAPONS_AIR_DAMAGES,
@@ -594,3 +614,12 @@ export const SEARCH_BUTTONS = {
     [SHIELD_STATE]: SEARCH_SHIELD,
     [DOFUS_STATE]: PRIMARY_STATS,
 }
+
+export const ENUM = Object.keys(translations)
+
+export const getKey = stat => findKey(stat, translations)
+export const translate = (stat, lang) => translateType(stat, translations, lang)
+export const populate = stat => translations[findKey(stat, translations)]
+
+export const validateType = (stat, translationName) =>
+    validate(stat, translationName, translations)

@@ -35,7 +35,7 @@ export const addCharacter = async ({ source, args, context, info }) => {
                 } user`
             )
 
-        const updated = await Users.updateOne(
+        const updated = await Users.findOneAndUpdate(
             { _id: args.userId },
             { $push: { characters: args.characterId } },
             { new: true }
@@ -43,21 +43,6 @@ export const addCharacter = async ({ source, args, context, info }) => {
         if (!updated) throw new Error('Error on update')
 
         return Users.findOne({ _id: args.userId }) // return the record
-    } catch (e) {
-        return e
-    }
-}
-
-export async function signup(rp) {
-    try {
-        const { args } = rp
-
-        const username = (args.username || '').toLowerCase()
-        const hash = await generateHash(args.password)
-
-        await Users.create({ username: username.toLowerCase(), hash })
-
-        return await login(rp)
     } catch (e) {
         return e
     }

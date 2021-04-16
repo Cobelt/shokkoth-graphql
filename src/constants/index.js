@@ -8,6 +8,7 @@ export * as SKINS from './skins'
 export * as STATS from './stats'
 export * as USERS from './users'
 export * as WEAPONS from './weapons'
+export * as TAGS from './tags'
 
 export * as STUFFS from './stuffs'
 

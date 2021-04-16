@@ -10,6 +10,7 @@ import useStuffs from './stuffs'
 import useRecipes from './recipes'
 import useResources from './resources'
 import useSets from './sets'
+import useStats from './stats'
 import useUsers from './users'
 
 const customizationOptions = {
@@ -18,12 +19,13 @@ const customizationOptions = {
     },
 }
 
+const StatsTC = useStats(schemaComposer)
 const BreedsTC = useBreeds(schemaComposer, customizationOptions)
 const RecipesTC = useRecipes(schemaComposer, customizationOptions)
 const ResourcesTC = useResources(schemaComposer, customizationOptions)
-const SetsTC = useSets(schemaComposer, customizationOptions)
+const SetsTC = useSets(schemaComposer, customizationOptions, { StatsTC })
 const EquipmentsTC = useEquipments(schemaComposer, customizationOptions)
-const StuffsTC = useStuffs(schemaComposer, customizationOptions)
+const StuffsTC = useStuffs(schemaComposer, customizationOptions, { StatsTC })
 const CharactersTC = useCharacters(schemaComposer, customizationOptions)
 const UsersTC = useUsers(schemaComposer, customizationOptions)
 const AuthTC = useAuth(schemaComposer)

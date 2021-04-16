@@ -1,7 +1,11 @@
 import set from 'lodash.set'
+import memoize from 'lodash.memoize'
 
+import { STATS } from '../../constants'
 import { Users, Stuffs } from '../../models'
 import { getUserId, isAtLeastAdmin } from '../auth'
+
+export const IMPORT_STUFF_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?<domain>dofusbook|d-bk)\.net\/(?:fr|es|en)\/(?:equipe?ments?||d)\/(?:(?<id>\d+)|.+)?/
 
 export async function isStuffOwner(userId, stuffId) {
     if (!stuffId) return true
@@ -20,7 +24,7 @@ export const canSeeStuff = next => async rp => {
         if (stuff?.public) {
             return next(rp)
         }
-        return next(new Error('User does not have access to this stuff.'))
+        return next('User does not have access to this stuff.')
     }
 
     return next(rp)
@@ -54,3 +58,36 @@ export const sortByLatest = next => rp => {
     }
     return next(rp)
 }
+
+export function initStats() {
+    return Object.fromEntries(STATS?.ENUM?.map(stat => [stat, 0]))
+}
+
+export const getCurrentSetsBonuses = memoize(
+    equipments => {
+        const itemsPerSet = {}
+        const equipmentsWithSet = Object.values(equipments)
+            .map(equipment => ({
+                equipmentId: equipment?._id,
+                setId: equipment?.setId,
+            }))
+            .filter(e => !!e?.setId)
+        equipmentsWithSet.forEach(({ equipmentId, setId }) => {
+            if (setId) {
+                if (!itemsPerSet?.[setId]) {
+                    itemsPerSet[setId] = {
+                        nbItems: 1,
+                        equiped: [equipmentId],
+                        setId,
+                    }
+                } else {
+                    itemsPerSet[setId].nbItems++
+                    itemsPerSet[setId].equiped?.push(equipmentId)
+                }
+            }
+        })
+        return Object.values(itemsPerSet).filter(i => i.nbItems > 1)
+    },
+    equipments =>
+        JSON.stringify(equipments?.length > 0 && equipments?.map(e => e?._id))
+)

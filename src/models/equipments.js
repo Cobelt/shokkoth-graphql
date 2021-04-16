@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 import { COMMON } from '../constants'
 import { updateLastModifDate } from '../utils'
 
+import Sets from './sets'
+
 const prefixError = ({ _id }, errorString) =>
     `Error on an Equipment#${_id}: ${errorString}`
 
@@ -58,6 +60,13 @@ export const EquipmentsSchema = new mongoose.Schema({
 
     imgUrl: String,
     url: String,
+
+    setAnkamaId: Number,
+
+    setId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Sets',
+    },
 
     // Use false when directly extracted from dofapi
     // validated: Boolean,

@@ -7,5 +7,5 @@ export const canUpdateUser = next => rp => {
         return next(new Error('You do not have access to this user.'))
     }
 
-    next(rp)
+    return next(rp)
 }

@@ -1,10 +1,14 @@
-export function setCookie(res, { name, value, expiresIn = 7 }) {
+export function setCookie(
+    res,
+    { name, value, httpOnly = false, expiresIn = 7, maxAge }
+) {
     // expiresIn days
     if (!name || !value) return
     res.cookie(name, value, {
-        maxAge: expiresIn * 24 * 60 * 60 * 1000,
+        maxAge: maxAge || expiresIn * 24 * 60 * 60 * 1000,
         path: '/',
         domain: '.shokkoth.tk',
+        httpOnly,
     })
 }
 

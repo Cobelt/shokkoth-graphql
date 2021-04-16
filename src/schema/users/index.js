@@ -26,34 +26,6 @@ export default function useUsers(schemaComposer, customizationOptions = {}) {
     })
 
     UsersTC.addResolver({
-        name: 'signin',
-        type: 'String',
-        args: { username: 'String!', password: 'String!' },
-        resolve: rsv.signin,
-    })
-
-    UsersTC.addResolver({
-        name: 'login',
-        type: 'String',
-        args: { email: 'String', username: 'String', password: 'String!' },
-        resolve: rsv.login,
-    })
-
-    UsersTC.addResolver({
-        name: 'logout',
-        type: 'Boolean',
-        args: {},
-        resolve: rsv.logout,
-    })
-
-    UsersTC.addResolver({
-        name: 'decodeToken',
-        type: UsersTC,
-        args: {},
-        resolve: rp => getJWTDecoded(rp),
-    })
-
-    UsersTC.addResolver({
         name: 'me',
         type: UsersTC,
         args: {},
@@ -77,7 +49,6 @@ export default function useUsers(schemaComposer, customizationOptions = {}) {
     schemaComposer.Mutation.addFields({
         addCharacterToUser: UsersTC.get('$addCharacter'),
         updateMe: UsersTC.get('$updateMe'),
-        signin: UsersTC.get('$signin'),
 
         ...adminAccess({
             userCreateOne: UsersTC.get('$createOne'),

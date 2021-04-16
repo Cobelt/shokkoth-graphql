@@ -7,7 +7,7 @@ import {
     validate,
 } from '../utils'
 
-export const MOUNT = 'Montures'
+export const MOUNT = 'Monture'
 
 export const translations = {
     MOUNT: {

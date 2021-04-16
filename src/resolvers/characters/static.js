@@ -10,12 +10,14 @@ export async function isCharacterOwner(userId, characterId) {
 
 export const canUpdateCharacter = next => rp => {
     const userId = rp?.context?.userId || getUserId(rp)
+    const characterId = rp?.args?.characterId
     if (
-        !isCharacterOwner(userId, rp?.args?.characterId) &&
+        characterId &&
+        !isCharacterOwner(userId, characterId) &&
         !isAtLeastAdmin(rp)
     ) {
         return next(new Error('User does not have access to this character.'))
     }
 
-    next(rp)
+    return next(rp)
 }

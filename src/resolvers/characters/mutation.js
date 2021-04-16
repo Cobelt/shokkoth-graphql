@@ -14,7 +14,7 @@ export const addStuff = async ({ source, args, context, info }) => {
             )
         }
 
-        const updated = await Characters.updateOne(
+        const updated = await Characters.findOneAndUpdate(
             { _id: args.characterId },
             { $push: { stuffs: args.stuffId } },
             { new: true }
@@ -37,7 +37,7 @@ export const removeStuff = async ({ source, args, context, info }) => {
     } catch (e) {
         return e
     }
-    return Characters.updateOne(
+    return Characters.findOneAndUpdate(
         { _id: args.characterId },
         { $pull: { stuffs: args.stuffId } },
         { new: true }
@@ -64,7 +64,9 @@ export const createOne = async ({ args, context }) => {
 export const updateOne = async ({ source, args, context, info }) => {
     try {
         const { characterId, record } = args
-        return Characters.updateOne({ _id: characterId }, record, { new: true })
+        return Characters.findOneAndUpdate({ _id: characterId }, record, {
+            new: true,
+        })
     } catch (e) {
         return e
     }

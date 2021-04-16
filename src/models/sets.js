@@ -22,10 +22,12 @@ export const SetsSchema = new mongoose.Schema({
     imgUrl: String,
     url: String,
 
-    bonus: {
-        type: Array,
-        default: [],
-    },
+    bonus: [
+        {
+            nbItems: { type: Number },
+            statistics: Object,
+        },
+    ],
 
     equipments: [
         {

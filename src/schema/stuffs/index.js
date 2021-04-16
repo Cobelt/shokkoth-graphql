@@ -1,13 +1,17 @@
 import { composeWithMongoose } from 'graphql-compose-mongoose'
-import { Stuffs } from '../../models'
+import { Stuffs, Stats } from '../../models'
 
 import { canUpdateCharacter } from '../../resolvers/characters'
-import { ownOrAdmin, adminAccess } from '../../resolvers/auth'
+import { adminAccess } from '../../resolvers/auth'
 import * as resolvers from '../../resolvers/stuffs'
 
 import { STUFFS } from '../../filters'
 
-export default function useStuffs(schemaComposer, customizationOptions = {}) {
+export default function useStuffs(
+    schemaComposer,
+    customizationOptions = {},
+    { StatsTC } = {}
+) {
     const StuffsTC = composeWithMongoose(Stuffs, customizationOptions)
 
     StuffsTC.setResolver(
@@ -25,6 +29,27 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
     })
 
     StuffsTC.addResolver({
+        name: 'getEquipmentsStats',
+        type: 'JSON',
+        args: { equipments: '[MongoID]' },
+        resolve: resolvers.getEquipmentsStats,
+    })
+
+    StuffsTC.addResolver({
+        name: 'getSetsBonuses',
+        type: 'JSON',
+        args: { equipments: '[MongoID]', stuffId: 'MongoID!' },
+        resolve: resolvers.getSetsBonuses,
+    })
+
+    StuffsTC.addResolver({
+        name: 'getStats',
+        type: StatsTC,
+        args: { equipments: '[MongoID]', stuffId: 'MongoID!' },
+        resolve: resolvers.getStats,
+    })
+
+    StuffsTC.addResolver({
         kind: 'mutation',
         name: 'equip',
         type: StuffsTC,
@@ -38,10 +63,10 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
 
     StuffsTC.addResolver({
         kind: 'mutation',
-        name: 'removeEquipment',
+        name: 'unequip',
         type: StuffsTC,
         args: { stuffId: 'MongoID!', equipmentId: 'MongoID!' },
-        resolve: resolvers.removeEquipment,
+        resolve: resolvers.unequip,
     })
 
     StuffsTC.addResolver({
@@ -59,7 +84,7 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
         // change args to public / name / level / equipments ?
         args: {
             record: StuffsTC.get('$updateOne').getArgs().record,
-            stuffId: 'MongoID',
+            stuffId: 'MongoID!',
         },
         resolve: resolvers.save,
     })
@@ -68,34 +93,17 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
         kind: 'mutation',
         name: 'createStuff',
         type: StuffsTC,
-        // change args to public / name / level / equipments ?
         args: StuffsTC.get('$createOne').getArgs(),
-        resolve: async function createOne(rp) {
-            try {
-                const { record } = rp.args
-                const userId = getUserId(rp)
-
-                const stuff = await Stuffs.create(record)
-                await Users.updateOne(
-                    { _id: userId },
-                    { $push: { stuffs: stuff._id } }
-                ).exec()
-
-                return Stuffs.findOne({ _id: stuff._id })
-            } catch (e) {
-                return e
-            }
-        },
+        resolve: resolvers.createOne,
     })
 
     StuffsTC.addResolver({
         kind: 'mutation',
-        name: 'updateStuff',
+        name: 'updateOne',
         type: StuffsTC,
-        // change args to public / name / level / equipments ?
         args: {
-            record: StuffsTC.get('$updateOne').getArgs().record,
             stuffId: 'MongoID!',
+            record: StuffsTC.get('$updateOne').getArgs()?.record,
         },
         resolve: resolvers.updateOne,
     })
@@ -104,7 +112,6 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
         kind: 'mutation',
         name: 'duplicateStuff',
         type: StuffsTC,
-        // change args to public / name / level / equipments ?
         args: { stuffId: 'MongoID!', characterId: 'MongoID' },
         resolve: resolvers.duplicateOne,
     })
@@ -115,6 +122,14 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
         type: StuffsTC,
         args: { stuffId: 'MongoID!' },
         resolve: resolvers.removeOne,
+    })
+
+    StuffsTC.addResolver({
+        kind: 'mutation',
+        name: 'importStuff',
+        type: StuffsTC,
+        args: { link: 'String!', characterId: 'MongoID' },
+        resolve: resolvers.importStuff,
     })
 
     schemaComposer.Query.addFields({
@@ -141,9 +156,7 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
 
     schemaComposer.Mutation.addFields({
         equip: StuffsTC.get('$equip').wrapResolve(resolvers.canUpdateStuff),
-        unequip: StuffsTC.get('$removeEquipment').wrapResolve(
-            resolvers.canUpdateStuff
-        ),
+        unequip: StuffsTC.get('$unequip').wrapResolve(resolvers.canUpdateStuff),
         emptyEquipments: StuffsTC.get('$emptyEquipments').wrapResolve(
             resolvers.canUpdateStuff
         ),
@@ -154,14 +167,15 @@ export default function useStuffs(schemaComposer, customizationOptions = {}) {
         saveStuff: StuffsTC.get('$saveStuff').wrapResolve(
             resolvers.canUpdateStuff
         ),
-        createStuff: StuffsTC.get('$createStuff').wrapResolve(
-            resolvers.canUpdateStuff
-        ),
-        updateStuff: StuffsTC.get('$updateStuff').wrapResolve(
+        createStuff: StuffsTC.get('$createStuff'),
+        updateStuff: StuffsTC.get('$updateOne').wrapResolve(
             resolvers.canUpdateStuff
         ),
         removeStuff: StuffsTC.get('$removeStuff').wrapResolve(
             resolvers.canUpdateStuff
+        ),
+        importStuff: StuffsTC.get('$importStuff').wrapResolve(
+            canUpdateCharacter
         ),
 
         ...adminAccess({

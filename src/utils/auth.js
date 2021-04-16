@@ -1,19 +1,19 @@
 import jwt from 'jsonwebtoken'
 
 import { getParam } from './query'
-import { SECRET_KEY } from '../env'
 
-export const findJWT = async req => {
+export function findJWT(req) {
     let token =
         req?.headers?.authorization ||
         getParam(req, 'jwt') ||
         getParam(req, 'login/TOKEN') ||
         req?.cookies?.['login/TOKEN'] // Express headers are auto converted to lowercase
-    if (!token || typeof token !== 'string') return
+    if (!token || typeof token !== 'string') return null
 
-    if (token.startsWith('Bearer ')) {
+    const start = 'Bearer '
+    if (token.startsWith(start)) {
         // Remove Bearer from string
-        token = token.slice(7, token.length)
+        token = token.slice(start.length, token.length)
     }
     return token || undefined
 }
@@ -21,7 +21,7 @@ export const findJWT = async req => {
 export async function decodeToken(token) {
     if (!token) return
     try {
-        return await jwt.verify(token, SECRET_KEY)
+        return await jwt.verify(token, process.env.SECRET_KEY)
     } catch (err) {
         return null
     }

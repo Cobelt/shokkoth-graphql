@@ -2,6 +2,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose'
 
 import { Sets } from '../../models'
 import { adminAccess } from '../../resolvers/auth'
+import * as rsv from '../../resolvers/sets'
 import { COMMON, SETS } from '../../filters'
 
 export default function useSets(schemaComposer, customizationOptions = {}) {
@@ -23,6 +24,22 @@ export default function useSets(schemaComposer, customizationOptions = {}) {
             .addFilterArg(SETS.searchName)
     )
 
+    SetsTC.addResolver({
+        type: 'mutation',
+        name: 'importFromDofapi',
+        type: [SetsTC],
+        args: { ankamaId: '[String]' },
+        resolve: rsv.importFromDofapi,
+    })
+
+    SetsTC.addResolver({
+        type: 'mutation',
+        name: 'importSetsBonuses',
+        type: [SetsTC],
+        args: { startId: 'Float', endId: 'Float' },
+        resolve: rsv.importSetsBonuses,
+    })
+
     schemaComposer.Query.addFields({
         setById: SetsTC.get('$findById'),
         setByIds: SetsTC.get('$findByIds'),
@@ -37,6 +54,8 @@ export default function useSets(schemaComposer, customizationOptions = {}) {
 
     schemaComposer.Mutation.addFields({
         ...adminAccess({
+            importSets: SetsTC.get('$importFromDofapi'),
+            importSetsBonuses: SetsTC.get('$importSetsBonuses'),
             setCreateOne: SetsTC.get('$createOne'),
             setCreateMany: SetsTC.get('$createMany'),
             setUpdateById: SetsTC.get('$updateById'),

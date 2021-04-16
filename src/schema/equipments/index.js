@@ -3,6 +3,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose'
 import { Equipments } from '../../models'
 
 import { adminAccess } from '../../resolvers/auth'
+import * as rsv from '../../resolvers/equipments'
 
 import { generateEquipmentsResolvers, completeFilter } from './static'
 
@@ -19,6 +20,14 @@ export default function useEquipments(
     completeFilter(EquipmentsTC, 'updateMany')
     completeFilter(EquipmentsTC, 'removeOne')
     completeFilter(EquipmentsTC, 'removeMany')
+
+    EquipmentsTC.addResolver({
+        type: 'mutation',
+        name: 'importFromDofapi',
+        type: [EquipmentsTC],
+        args: { ankamaId: '[String]' },
+        resolve: rsv.importFromDofapi,
+    })
 
     schemaComposer.Query.addFields({
         equipmentById: EquipmentsTC.get('$findById'),
@@ -37,6 +46,18 @@ export default function useEquipments(
     })
     schemaComposer.Mutation.addFields({
         ...adminAccess({
+            importEquipments: EquipmentsTC.get('$importFromDofapi').wrapResolve(
+                rsv.importEquipments
+            ),
+            importWeapons: EquipmentsTC.get('$importFromDofapi').wrapResolve(
+                rsv.importWeapons
+            ),
+            importPets: EquipmentsTC.get('$importFromDofapi').wrapResolve(
+                rsv.importPets
+            ),
+            importMounts: EquipmentsTC.get('$importFromDofapi').wrapResolve(
+                rsv.importMounts
+            ),
             equipmentCreateOne: EquipmentsTC.get('$createOne'),
             equipmentCreateMany: EquipmentsTC.get('$createMany'),
             equipmentUpdateById: EquipmentsTC.get('$updateById'),

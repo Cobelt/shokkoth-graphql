@@ -1,3 +1,5 @@
+import { getEquipmentsStats } from '../../resolvers/stuffs'
+
 export default function createRelations({
     BreedsTC,
     SetsTC,
@@ -43,6 +45,32 @@ export default function createRelations({
             _ids: source => source.equipments,
         },
         projection: { equipments: 1 },
+    })
+
+    StuffsTC.addRelation('stats', {
+        resolver: () => StuffsTC.get('$getStats'),
+        prepareArgs: {
+            equipmentsIds: source => source.equipments,
+            stuffId: source => source._id,
+        },
+        projection: { stats: 1 },
+    })
+
+    StuffsTC.addRelation('equipmentsStats', {
+        resolver: () => StuffsTC.get('$getEquipmentsStats'),
+        prepareArgs: {
+            equipmentsIds: source => source.equipments,
+        },
+        projection: { equipmentsStats: 1 },
+    })
+
+    StuffsTC.addRelation('setsBonuses', {
+        resolver: () => StuffsTC.get('$getSetsBonuses'),
+        prepareArgs: {
+            equipmentsIds: source => source.equipments,
+            stuffId: source => source._id,
+        },
+        projection: { setBonuses: 1 },
     })
 
     StuffsTC.addRelation('breed', {

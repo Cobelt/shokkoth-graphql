@@ -1,4 +1,5 @@
 import express from 'express'
+import dotenv from 'dotenv'
 import path from 'path'
 import { graphqlHTTP } from 'express-graphql'
 import mongoose from 'mongoose'
@@ -6,12 +7,14 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import favicon from 'serve-favicon'
 
+dotenv.config()
+
 import { setLocale, getLocale, decodeToken, findJWT } from './utils'
 
 import './models'
 import schema from './schema'
 
-import { PORT, ALLOWED_ORIGINS } from './env'
+import { ALLOWED_ORIGINS } from './static'
 
 const hostname = '0.0.0.0'
 const port = process.env.PORT || PORT || 4000

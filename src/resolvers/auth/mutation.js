@@ -1,6 +1,12 @@
 import { Users } from '../../models'
-import { setCookie } from '../../utils/cookies'
-import { generateJWT, comparePassword } from './static'
+
+import {
+    generateJWT,
+    generateRefreshToken,
+    comparePassword,
+    getJWTDecoded,
+    generateHash,
+} from './static'
 
 export async function login(rp) {
     try {
@@ -9,33 +15,31 @@ export async function login(rp) {
         // if (getJWTDecoded(rp) && Date.now() < exp * 1000) throw new Error('You are already logged with another account');
 
         const username = (args.username || '').toLowerCase()
-        const email = (args.email || '').toLowerCase()
-        if (!username && !email)
-            throw new Error(
-                "L'username ou l'email est requis pour se connecter"
-            )
+        const { password } = args || {}
+
+        if (!username) {
+            throw new Error("L'username est requis pour se connecter.")
+        }
+
+        if (!password) {
+            throw new Error('Le mot de passe est requis pour se connecter.')
+        }
 
         const user = await Users.findOne({
-            $or: [
-                { username: username.toLowerCase() },
-                { email: email.toLowerCase() },
-            ],
-        }).exec()
+            username: username.toLowerCase(),
+        })
 
-        if (!user)
+        if (!user) {
             throw new Error("L'username ou le mot de passe est incorrect")
+        }
 
-        const passwordMatch = await comparePassword(args.password, user.hash)
-        if (!passwordMatch)
+        const passwordMatch = await comparePassword(password, user?.hash)
+        if (!passwordMatch) {
             throw new Error("L'username ou le mot de passe est incorrect")
-        else {
-            const token = await generateJWT(user)
-            setCookie(context.res, {
-                name: 'login/TOKEN',
-                value: token,
-                expiresIn: 1 / 24,
-            })
-            return token
+        } else {
+            await generateRefreshToken(user, rp)
+
+            return await generateJWT(user, rp)
         }
     } catch (e) {
         return e
@@ -44,7 +48,33 @@ export async function login(rp) {
 
 export async function logout(rp) {
     try {
-        return true
+        const { _id } = getJWTDecoded(rp)
+        return RefreshTokens.deleteOne({ user: { _id } })
+    } catch (e) {
+        return e
+    }
+}
+
+export async function signup(rp) {
+    try {
+        const { args } = rp
+
+        const username = (args.username || '').toLowerCase()
+        const { password } = args || {}
+
+        if (!username) {
+            throw new Error("L'username est requis pour s'inscrire.")
+        }
+
+        if (!password) {
+            throw new Error("Le mot de passe est requis pour s'inscrire.")
+        }
+
+        const hash = await generateHash(password)
+
+        await Users.create({ username: username.toLowerCase(), hash })
+
+        return await login(rp)
     } catch (e) {
         return e
     }

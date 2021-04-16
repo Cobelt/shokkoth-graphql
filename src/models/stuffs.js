@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 
-import { CHARACTERS, COMMON, WEAPONS } from '../constants'
+import Equipments from './equipments'
+
+import { CHARACTERS, COMMON, WEAPONS, TAGS } from '../constants'
 import { updateLastModifDate } from '../utils'
 
 export const StuffsSchema = new mongoose.Schema({
@@ -18,7 +20,6 @@ export const StuffsSchema = new mongoose.Schema({
     breed: {
         type: Number,
         ref: 'Breeds',
-        required: 'Pas de classe définie',
     },
 
     level: {
@@ -27,31 +28,24 @@ export const StuffsSchema = new mongoose.Schema({
         default: 200,
     },
 
-    // tags: {
-    //     type: Array,
-    //     default: [],
-    // },
-
-    stats: [
-        {
-            attributed: {
-                VITALITY: { type: Number, default: 0 },
-                WIDSDOM: { type: Number, default: 0 },
-                STRENGTH: { type: Number, default: 0 },
-                INTELLIGENCE: { type: Number, default: 0 },
-                CHANCE: { type: Number, default: 0 },
-                AGILITY: { type: Number, default: 0 },
-            },
-            parchment: {
-                VITALITY: { type: Number, default: 0 },
-                WIDSDOM: { type: Number, default: 0 },
-                STRENGTH: { type: Number, default: 0 },
-                INTELLIGENCE: { type: Number, default: 0 },
-                CHANCE: { type: Number, default: 0 },
-                AGILITY: { type: Number, default: 0 },
-            },
+    baseStats: {
+        attributed: {
+            VITALITY: { type: Number, default: 0 },
+            WIDSDOM: { type: Number, default: 0 },
+            STRENGTH: { type: Number, default: 0 },
+            INTELLIGENCE: { type: Number, default: 0 },
+            CHANCE: { type: Number, default: 0 },
+            AGILITY: { type: Number, default: 0 },
         },
-    ],
+        scroll: {
+            VITALITY: { type: Number, default: 0 },
+            WIDSDOM: { type: Number, default: 0 },
+            STRENGTH: { type: Number, default: 0 },
+            INTELLIGENCE: { type: Number, default: 0 },
+            CHANCE: { type: Number, default: 0 },
+            AGILITY: { type: Number, default: 0 },
+        },
+    },
 
     equipments: [
         {
@@ -60,10 +54,19 @@ export const StuffsSchema = new mongoose.Schema({
         },
     ],
 
+    smithmagic: Object,
+
     public: {
         type: Boolean,
         default: true,
     },
+
+    tags: [
+        {
+            type: String,
+            enum: TAGS.ENUM,
+        },
+    ],
 
     // likes: [{
     //   type: [mongoose.Schema.Types.ObjectId],

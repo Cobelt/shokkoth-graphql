@@ -25,7 +25,7 @@ export function removeSuperflux(equipments = [], equipsOfType, maxCount) {
             equipsOfType.length - maxCount,
             equipsOfType.length - 1
         )
-        console.log({ toRemove })
+        // console.log({ toRemove })
         return equipments.filter(equip =>
             toRemove.every(toRm => toRm._id !== equip._id)
         )

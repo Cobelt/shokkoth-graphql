@@ -1,0 +1,51 @@
+import { STATS } from '../../constants'
+
+export const dofusbookStatsMap = {
+    //primaire
+    pa: STATS.AP,
+    pm: STATS.MP,
+    po: STATS.RANGE,
+    vi: STATS.VITALITY,
+    in: STATS.INTELLIGENCE,
+    ch: STATS.CHANCE,
+    fo: STATS.STRENGTH,
+    ag: STATS.AGILITY,
+    sa: STATS.WISDOM,
+    ii: STATS.INITIATIVE,
+    pu: STATS.PUISSANCE,
+    ic: STATS.SUMMONS,
+    //cc
+    cc: STATS.CRITICAL,
+    dc: STATS.CRITICAL_DAMAGE,
+    rc: STATS.CRITICAL_RESISTANCE,
+    //dopou
+    dc: STATS.PUSHBACK_DAMAGE,
+    rc: STATS.PUSHBACK_RESISTANCE,
+    //secondaire
+    rpa: STATS.AP_REDUCTION,
+    rpm: STATS.MP_REDUCTION,
+    epa: STATS.AP_PARRY,
+    epm: STATS.MP_PARRY,
+    ta: STATS.LOCK,
+    fu: STATS.DODGE,
+    so: STATS.HEALS,
+    pp: STATS.PROSPECTING,
+    // do
+    dnf: STATS.NEUTRAL_DAMAGE,
+    def: STATS.WATER_DAMAGE,
+    daf: STATS.AIR_DAMAGE,
+    dff: STATS.FIRE_DAMAGE,
+    dtf: STATS.EARTH_DAMAGE,
+    //%res
+    rnp: STATS.NEUTRAL_RESISTANCE,
+    rep: STATS.WATER_RESISTANCE,
+    rap: STATS.AIR_RESISTANCE,
+    rfp: STATS.FIRE_RESISTANCE,
+    rtp: STATS.EARTH_RESISTANCE,
+    // res
+    rn: STATS.NEUTRAL_STATIC_RESISTANCE,
+    re: STATS.WATER_STATIC_RESISTANCE,
+    ra: STATS.AIR_STATIC_RESISTANCE,
+    rf: STATS.FIRE_STATIC_RESISTANCE,
+    rt: STATS.EARTH_STATIC_RESISTANCE,
+}

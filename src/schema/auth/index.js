@@ -10,9 +10,16 @@ export default function useAuth(schemaComposer) {
     })
 
     AuthTC.addResolver({
+        name: 'signup',
+        type: 'String',
+        args: { username: 'String!', password: 'String!' },
+        resolve: rsv.signup,
+    })
+
+    AuthTC.addResolver({
         name: 'login',
         type: 'String',
-        args: { email: 'String', username: 'String', password: 'String!' },
+        args: { username: 'String!', password: 'String!' },
         resolve: rsv.login,
     })
 
@@ -37,6 +44,7 @@ export default function useAuth(schemaComposer) {
     schemaComposer.Mutation.addFields({
         login: AuthTC.get('$login'),
         logout: AuthTC.get('$logout'),
+        signup: AuthTC.get('$signup'),
     })
 
     return AuthTC

@@ -1,8 +1,8 @@
 export function updateLastModifDate(next) {
     try {
         this.updatedAt = Date.now()
-        next()
+        return next()
     } catch (err) {
-        next(err)
+        return next(err)
     }
 }

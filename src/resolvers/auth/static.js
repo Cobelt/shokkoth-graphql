@@ -2,27 +2,65 @@ import memoize from 'lodash.memoize'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import { SECRET_KEY } from '../../env'
+import { RefreshTokens, Users } from '../../models'
+import { getLocale, setCookie } from '../../utils'
 
-import { Users } from '../../models'
-import { getLocale } from '../../utils'
-
-export async function generateJWT(user) {
+export async function generateRefreshToken(user, { context } = {}) {
     try {
+        const EXPIRES_DAYS = 60
+
+        const token = await jwt.sign(
+            { _id: user?._id },
+            process.env.SECRET_KEY,
+            {
+                algorithm: 'HS256',
+                expiresIn: EXPIRES_DAYS + 'd',
+            }
+        )
+        if (!token) return res.status(500).send('No token created')
+
+        await RefreshTokens.findOneAndUpdate(
+            { user },
+            { user, token, createdAt: Date.now() },
+            { new: true }
+        )
+
+        setCookie(context.res, {
+            name: 'login/REFRESH',
+            value: token,
+            expiresIn: EXPIRES_DAYS,
+            httpOnly: true,
+        })
+
+        return token
+    } catch (e) {
+        return e
+    }
+}
+export async function generateJWT(user, { context } = {}) {
+    try {
+        const EXPIRES_MINUTES = 20
+
         const { _id, username, email, roles } = user
 
         const token = await jwt.sign(
             { _id, username, email, roles },
-            SECRET_KEY,
-            { algorithm: 'HS256', expiresIn: '7d' }
+            process.env.SECRET_KEY,
+            { algorithm: 'HS256', expiresIn: EXPIRES_MINUTES + 'm' }
         )
         if (!token) return res.status(500).send('No token created')
 
-        await Users.updateOne(
+        await Users.findOneAndUpdate(
             { _id },
             { $set: { lastConnection: Date.now() } },
             { new: true }
         )
+
+        setCookie(context.res, {
+            name: 'login/TOKEN',
+            value: token,
+            maxAge: EXPIRES_MINUTES * 60 * 1000,
+        })
 
         return token
     } catch (e) {
@@ -39,7 +77,7 @@ export function getUserId({ context } = {}) {
 }
 
 export function hasRoles({ context } = {}, wantedRoles) {
-    const roles = getJWTDecoded({ context })?.roles
+    const { roles } = getJWTDecoded({ context }) || {}
     return roles && [wantedRoles].flat().some(role => roles.includes(role))
 }
 
@@ -65,7 +103,7 @@ export function adminAccess(resolvers) {
                 context.userId = getUserId({ context })
 
                 if (!isAtLeastAdmin({ context })) {
-                    next(
+                    return next(
                         new Error(
                             'You should be admin, to have access to this action.'
                         )
@@ -105,8 +143,8 @@ export function ownOrAdmin(resolvers) {
     return resolvers
 }
 
-export function generateHash(password) {
-    return bcrypt.hash(password, 12)
+export function generateHash(toHash) {
+    return bcrypt.hash(toHash, 12)
 }
 
 export function comparePassword(passwordToVerify, hash) {

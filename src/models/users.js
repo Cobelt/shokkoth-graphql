@@ -14,9 +14,6 @@ export const UsersSchema = new mongoose.Schema({
 
     email: {
         type: String,
-        index: {
-            unique: true,
-        },
     },
 
     hash: {
@@ -76,9 +73,9 @@ UsersSchema.pre('save', function (next) {
     try {
         if (this.isModified('password') || this.isNew) {
         }
-        next()
+        return next()
     } catch (err) {
-        next(err)
+        return next(err)
     }
 })
 
