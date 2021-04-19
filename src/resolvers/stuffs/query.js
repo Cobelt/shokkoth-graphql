@@ -194,16 +194,22 @@ export async function getStats(rp) {
 
         const { attributed, scroll } = baseStats || {}
 
-        for (let [stat, value] of Object.entries(attributed)) {
-            stats[stat] += value
+        if (scroll instanceof Object) {
+            for (let [stat, value] of Object.entries(attributed)) {
+                stats[stat] += value
+            }
         }
 
-        for (let [stat, value] of Object.entries(scroll)) {
-            stats[stat] += value
+        if (scroll instanceof Object) {
+            for (let [stat, value] of Object.entries(scroll)) {
+                stats[stat] += value
+            }
         }
 
-        for (let [stat, value] of Object.entries(smithmagic)) {
-            stats[stat] += value
+        if (smithmagic instanceof Object) {
+            for (let [stat, value] of Object.entries(smithmagic)) {
+                stats[stat] += value
+            }
         }
 
         if (equipmentsIds?.length > 0) {

@@ -26,7 +26,7 @@ const DB_NAME = process.env.MONGO_NAME || 'shokkoth'
 const app = express()
 
 // mongoose instance connection url connection
-mongoose.set('debug', process.env.MONGOOSE_DEBUG || false)
+mongoose.set('debug', process.env.MONGOOSE_DEBUG || 'false' === 'true')
 mongoose.Promise = global.Promise
 mongoose.connect(`mongodb://${DB_HOSTNAME}:${DB_PORT}/${DB_NAME}`, {
     useNewUrlParser: true,

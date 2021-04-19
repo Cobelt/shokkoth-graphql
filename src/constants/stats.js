@@ -88,7 +88,7 @@ export const WEAPONS_WATER_STEAL = 'vol Eau'
 export const WEAPONS_HEAL = 'PV rendus'
 
 export const WEAPONS_AP_COST = 'Coût en PA'
-export const WEAPONS_TIMES_PER_ROUND = 'fois par tour'
+export const WEAPONS_TIMES_PER_ROUND = 'Utilisations par tour'
 export const WEAPONS_RANGE = 'Portée'
 
 export const WEAPONS_CRITICAL = '% Critique (base)'

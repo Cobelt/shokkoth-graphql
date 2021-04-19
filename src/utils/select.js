@@ -1,16 +1,19 @@
+import memoize from 'lodash.memoize'
+
 import { toURLValid } from './format'
 
-export function findKey(type, translations) {
+export const findKey = memoize((type, translations) => {
+    if (!type) return null
     const validType = toURLValid(type)
+    if (!validType) return null
     const [foundKey, foundTranslation] =
-        Object.entries(translations).find(([key, translation]) => {
-            return (
+        Object.entries(translations).find(
+            ([key, translation]) =>
                 toURLValid(translation.fr) === validType ||
                 toURLValid(translation.en) === validType
-            )
-        }) || []
+        ) || []
     return foundKey
-}
+})
 
 export function findOrder(type, translations) {
     return translations?.[type]?.order

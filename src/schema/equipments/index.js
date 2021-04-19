@@ -29,6 +29,13 @@ export default function useEquipments(
         resolve: rsv.importFromDofapi,
     })
 
+    EquipmentsTC.addResolver({
+        name: 'generateCreateOne',
+        type: 'JSON',
+        args: { searchName: 'String' },
+        resolve: rsv.generateCreateOneFromDatafus,
+    })
+
     schemaComposer.Query.addFields({
         equipmentById: EquipmentsTC.get('$findById'),
         equipmentByIds: EquipmentsTC.get('$findByIds'),
@@ -37,6 +44,8 @@ export default function useEquipments(
         equipmentCount: EquipmentsTC.get('$count'),
         equipmentConnection: EquipmentsTC.get('$connection'),
         equipmentPagination: EquipmentsTC.get('$pagination'),
+
+        equipmentGenerateCreateOne: EquipmentsTC.get('$generateCreateOne'),
 
         ...generateEquipmentsResolvers(EquipmentsTC, {
             $findOne: 'One',

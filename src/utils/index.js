@@ -1,6 +1,7 @@
 export * from './auth'
 export * from './cookies'
 export * from './format'
+export * from './parse'
 export * from './query'
 export * from './select'
 export * from './update'

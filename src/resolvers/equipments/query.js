@@ -1,4 +1,6 @@
-import { WEAPONS } from '../../constants'
+import axios from 'axios'
+
+import { COMMON, WEAPONS, STATS } from '../../constants'
 import {
     AMULET,
     BACKPACK,
@@ -15,6 +17,7 @@ import {
 } from '../../constants/equipments'
 import { MOUNT } from '../../constants/mounts'
 import { PET, PETSMOUNT } from '../../constants/pets'
+import { formatImgUrl, formatStatistics } from '../../utils'
 import { setFilterType, setFilterTypes } from './static'
 
 export const hatOnly = next => rp => next(setFilterType(rp, getKey(HAT)))
@@ -45,3 +48,92 @@ export const dofusTrophiesPrysma = next => rp =>
 export const backOnly = next => rp =>
     next(setFilterTypes(rp, [getKey(CLOAK), getKey(BACKPACK)]))
 export const weaponOnly = next => rp => next(setFilterTypes(rp, WEAPONS.ENUM))
+
+export async function generateCreateOneFromDatafus(rp) {
+    try {
+        const { searchName } = rp?.args || {}
+
+        const { data } = await axios.get(
+            'https://lucberge.github.io/Datafus/21.01.27/fr/equipments'
+        )
+
+        if (Array.isArray(data) && data?.length > 0) {
+            const found = data?.find(equip =>
+                equip?.name?.match(new RegExp(searchName, 'i'))
+            )
+            if (!found) {
+                throw new Error('No item found with this name')
+            }
+
+            const {
+                id,
+                img,
+                type,
+                set,
+                effects,
+                conditions,
+                craft,
+                ...noFormatRequired
+            } = found || {}
+
+            const statistics = []
+            const otherStats = []
+            const passives = []
+
+            if (effects?.length > 0) {
+                effects.forEach(effect => {
+                    const match = effect?.match(
+                        /^(?<min>-?\d+) (?:à (?<max>-?\d+))? ?(?<name>.+)$/
+                    )
+
+                    const { min, max = min, value = max, name } =
+                        match?.groups || {}
+                    const type = STATS.getKey(name)
+
+                    if (type) {
+                        statistics.push({ min, max, value, type })
+                    } else if (name) {
+                        otherStats.push({
+                            min,
+                            max,
+                            value,
+                            name,
+                        })
+                    } else {
+                        passives.push({
+                            min,
+                            max,
+                            value,
+                            name: effect,
+                        })
+                    }
+                })
+            }
+
+            const trueType = COMMON.getKey(type)
+            const record = {
+                ...noFormatRequired,
+                ankamaId: id,
+                imgUrl: img,
+                statistics,
+                passives,
+                otherStats,
+                type: trueType,
+                category: COMMON.getCategory(trueType),
+                typeOrder: COMMON.getOrder(trueType),
+                setAnkamaId:
+                    set &&
+                    set.match(/panoplies\/(?<setAnkamaId>\d+)/)?.groups
+                        ?.setAnkamaId,
+            }
+
+            return { record: formatImgUrl(record) }
+        } else {
+            console.log({ data })
+            throw new Error('Data is not an array or is empty')
+        }
+    } catch (e) {
+        console.error(e)
+        return e
+    }
+}

@@ -9,7 +9,6 @@ export const BreedsSchema = new mongoose.Schema({
         required: 'Please give me a name',
     },
 
-    imgUrl: String,
     url: String,
 
     description: String,

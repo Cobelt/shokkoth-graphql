@@ -2,9 +2,18 @@ import { composeWithMongoose } from 'graphql-compose-mongoose'
 
 import { Breeds } from '../../models'
 import { adminAccess } from '../../resolvers/auth'
+import { importFromFile } from '../../resolvers/breeds'
 
 export default function useBreeds(schemaComposer, customizationOptions = {}) {
     const BreedsTC = composeWithMongoose(Breeds, customizationOptions)
+
+    BreedsTC.addResolver({
+        type: 'mutation',
+        name: 'importFromFile',
+        type: [BreedsTC],
+        args: null,
+        resolve: importFromFile,
+    })
 
     schemaComposer.Query.addFields({
         breedById: BreedsTC.get('$findById'),
@@ -20,6 +29,7 @@ export default function useBreeds(schemaComposer, customizationOptions = {}) {
 
     schemaComposer.Mutation.addFields({
         ...adminAccess({
+            importBreeds: BreedsTC.get('$importFromFile'),
             breedCreateOne: BreedsTC.get('$createOne'),
             breedCreateMany: BreedsTC.get('$createMany'),
             breedUpdateById: BreedsTC.get('$updateById'),

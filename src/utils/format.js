@@ -193,7 +193,7 @@ export const formatStatistics = toFormat => {
             let type = STATS.getKey(name) || undefined
             if (!type) {
                 const withoutNumbers = name?.replace(/-?\d+/, '')
-                const numbers = name?.match(/(<value>-?\d+)/)?.value
+                const numbers = name?.match(/(<value>-?\d+)/)?.groups?.value
 
                 const typeWithoutNumbers = STATS.getKey(withoutNumbers)
 
@@ -248,7 +248,6 @@ export const formatStatistics = toFormat => {
                     passivesArray.push({
                         type,
                         name: type ? undefined : name,
-                        imgUrl: getDefaultPassiveImg(name),
                         ...value,
                     })
                 }
@@ -378,7 +377,7 @@ export const formatImgUrl = toFormat => {
     if (toFormat.imgUrl) {
         toReturn.imgUrl = toFormat.imgUrl.replace(
             'https://s.ankama.com/www/static.ankama.com',
-            ''
+            '//img.shokkoth.fr'
         )
     }
     return toReturn
@@ -387,6 +386,7 @@ export const formatImgUrl = toFormat => {
 export const formatSetAnkamaId = toFormat => {
     const toReturn = toFormat
     toReturn.setAnkamaId = parseInt(toFormat?.setId, 10) || null
+    delete toReturn.setId
     return toReturn
 }
 
