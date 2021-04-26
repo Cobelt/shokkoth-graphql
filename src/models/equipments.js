@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+
 import { COMMON } from '../constants'
 import { updateLastModifDate } from '../utils'
 
@@ -10,7 +11,6 @@ const prefixError = ({ _id }, errorString) =>
 export const EquipmentsSchema = new mongoose.Schema({
     ankamaId: {
         type: Number,
-        unique: true,
         required: 'I need an _id',
     },
 
@@ -81,7 +81,8 @@ export const EquipmentsSchema = new mongoose.Schema({
     },
 })
 
-EquipmentsSchema.index({ name: 'text', type: 'text', category: 'text' })
+EquipmentsSchema.index({ ankamaId: 'text', type: 'text' }, { unique: true })
+EquipmentsSchema.index({ name: 'text' })
 
 EquipmentsSchema.on('index', function (err) {
     if (err) {

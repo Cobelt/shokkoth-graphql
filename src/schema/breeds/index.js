@@ -8,7 +8,6 @@ export default function useBreeds(schemaComposer, customizationOptions = {}) {
     const BreedsTC = composeWithMongoose(Breeds, customizationOptions)
 
     BreedsTC.addResolver({
-        type: 'mutation',
         name: 'importFromFile',
         type: [BreedsTC],
         args: null,

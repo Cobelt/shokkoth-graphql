@@ -5,7 +5,11 @@ import { Equipments } from '../../models'
 import { adminAccess } from '../../resolvers/auth'
 import * as rsv from '../../resolvers/equipments'
 
-import { generateEquipmentsResolvers, completeFilter } from './static'
+import addCreaturesFields from './creatures'
+import addEquipmentsFields from './equipments'
+import addWeaponsFields from './weapons'
+
+import { completeFilters } from './static'
 
 export default function useEquipments(
     schemaComposer,
@@ -13,27 +17,27 @@ export default function useEquipments(
 ) {
     const EquipmentsTC = composeWithMongoose(Equipments, customizationOptions)
 
-    completeFilter(EquipmentsTC, 'findMany')
-    completeFilter(EquipmentsTC, 'findOne')
-    completeFilter(EquipmentsTC, 'count')
-    completeFilter(EquipmentsTC, 'updateOne')
-    completeFilter(EquipmentsTC, 'updateMany')
-    completeFilter(EquipmentsTC, 'removeOne')
-    completeFilter(EquipmentsTC, 'removeMany')
+    // COMMON
+    completeFilters(EquipmentsTC, 'findMany')
+    completeFilters(EquipmentsTC, 'findOne')
+    completeFilters(EquipmentsTC, 'count')
+    completeFilters(EquipmentsTC, 'updateOne')
+    completeFilters(EquipmentsTC, 'updateMany')
+    completeFilters(EquipmentsTC, 'removeOne')
+    completeFilters(EquipmentsTC, 'removeMany')
 
     EquipmentsTC.addResolver({
-        type: 'mutation',
-        name: 'importFromDofapi',
+        name: 'import',
         type: [EquipmentsTC],
         args: { ankamaId: '[String]' },
-        resolve: rsv.importFromDofapi,
+        resolve: rsv.importData,
     })
 
     EquipmentsTC.addResolver({
-        name: 'generateCreateOne',
+        name: 'missing',
         type: 'JSON',
-        args: { searchName: 'String' },
-        resolve: rsv.generateCreateOneFromDatafus,
+        args: null,
+        resolve: rsv.missingComparedToDatafus,
     })
 
     schemaComposer.Query.addFields({
@@ -44,29 +48,10 @@ export default function useEquipments(
         equipmentCount: EquipmentsTC.get('$count'),
         equipmentConnection: EquipmentsTC.get('$connection'),
         equipmentPagination: EquipmentsTC.get('$pagination'),
-
-        equipmentGenerateCreateOne: EquipmentsTC.get('$generateCreateOne'),
-
-        ...generateEquipmentsResolvers(EquipmentsTC, {
-            $findOne: 'One',
-            $findMany: 'Many',
-            $count: 'Count',
-        }),
     })
+
     schemaComposer.Mutation.addFields({
         ...adminAccess({
-            importEquipments: EquipmentsTC.get('$importFromDofapi').wrapResolve(
-                rsv.importEquipments
-            ),
-            importWeapons: EquipmentsTC.get('$importFromDofapi').wrapResolve(
-                rsv.importWeapons
-            ),
-            importPets: EquipmentsTC.get('$importFromDofapi').wrapResolve(
-                rsv.importPets
-            ),
-            importMounts: EquipmentsTC.get('$importFromDofapi').wrapResolve(
-                rsv.importMounts
-            ),
             equipmentCreateOne: EquipmentsTC.get('$createOne'),
             equipmentCreateMany: EquipmentsTC.get('$createMany'),
             equipmentUpdateById: EquipmentsTC.get('$updateById'),
@@ -77,5 +62,10 @@ export default function useEquipments(
             equipmentRemoveMany: EquipmentsTC.get('$removeMany'),
         }),
     })
+
+    addEquipmentsFields({ EquipmentsTC, schemaComposer })
+    addCreaturesFields({ EquipmentsTC, schemaComposer })
+    addWeaponsFields({ EquipmentsTC, schemaComposer })
+
     return EquipmentsTC
 }

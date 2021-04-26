@@ -25,7 +25,6 @@ export default function useSets(schemaComposer, customizationOptions = {}) {
     )
 
     SetsTC.addResolver({
-        type: 'mutation',
         name: 'importFromDofapi',
         type: [SetsTC],
         args: { ankamaId: '[String]' },
@@ -33,7 +32,6 @@ export default function useSets(schemaComposer, customizationOptions = {}) {
     })
 
     SetsTC.addResolver({
-        type: 'mutation',
         name: 'importSetsBonuses',
         type: [SetsTC],
         args: { startId: 'Float', endId: 'Float' },

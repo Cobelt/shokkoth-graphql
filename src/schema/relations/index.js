@@ -76,7 +76,6 @@ export default function createRelations({
     StuffsTC.addRelation('breed', {
         resolver: () => BreedsTC.get('$findById'),
         prepareArgs: {
-            // resolver `findByIds` has `_ids` arg, let provide value to it
             _id: source => source.breed,
         },
         projection: { breed: 1 },

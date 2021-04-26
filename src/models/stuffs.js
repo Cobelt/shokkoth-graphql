@@ -54,6 +54,12 @@ export const StuffsSchema = new mongoose.Schema({
         },
     ],
 
+    // TODO
+    // variants: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Stuffs',
+    // },
+
     smithmagic: Object,
 
     public: {

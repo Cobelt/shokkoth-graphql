@@ -1,24 +1,24 @@
 import axios from 'axios'
 import clone from 'lodash.clonedeep'
-import set from 'lodash.set'
 
 import { Equipments } from '../../models'
+import { formatEquipment } from '../../utils'
 
-import { formatFullEquipment } from '../../utils'
+import { generateCreateOneFromDatafus } from './query'
 
-export async function importFromDofapi(rp) {
+export async function importData(rp) {
     try {
-        const { url } = rp?.args || {}
+        const { urlDofapi } = rp?.args || {}
 
-        if (!url) {
+        if (!urlDofapi) {
             throw new Error('You should give an url to fetch for import')
         }
 
-        const { data } = await axios.get(url)
+        const { data } = await axios.get(urlDofapi)
 
         return Promise.all(
             data?.map(async equipment => {
-                const formatted = formatFullEquipment(clone(equipment))
+                const formatted = formatEquipment(clone(equipment))
                 const equipmentSaved = Equipments.findOneAndUpdate(
                     { ankamaId: formatted?.ankamaId },
                     formatted,
@@ -34,22 +34,19 @@ export async function importFromDofapi(rp) {
     }
 }
 
-export const importEquipments = next => rp => {
-    set(rp, 'args.url', 'https://fr.dofus.dofapi.fr/equipments')
-    return next(rp)
-}
+export async function importEquipmentFromDatafus(rp) {
+    try {
+        const { record } = await generateCreateOneFromDatafus(rp)
+        const { ankamaId } = record
+        console.log({ record })
+        delete record.otherStats
 
-export const importWeapons = next => rp => {
-    set(rp, 'args.url', 'https://fr.dofus.dofapi.fr/weapons')
-    return next(rp)
-}
-
-export const importMounts = next => rp => {
-    set(rp, 'args.url', 'https://fr.dofus.dofapi.fr/mounts')
-    return next(rp)
-}
-
-export const importPets = next => rp => {
-    set(rp, 'args.url', 'https://fr.dofus.dofapi.fr/pets')
-    return next(rp)
+        return Equipments.findOneAndUpdate({ ankamaId }, record, {
+            new: true,
+            upsert: true,
+        })
+    } catch (e) {
+        console.error(e)
+        return e
+    }
 }

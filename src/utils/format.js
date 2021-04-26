@@ -209,7 +209,7 @@ export const formatStatistics = toFormat => {
                     }
                 }
             }
-
+            // example : (dommages Air) -> finalName: dommages Air
             if (name.match(/^\(.*?\)$/)) {
                 const finalName = name.replace(/^\((.*?)\)$/, '$1')
                 const type = getWeaponCharacType(finalName)
@@ -344,18 +344,15 @@ export const formatRecipe = toFormat => {
 }
 
 // For Equipments, Weapons, Pets, Mounts
-export const formatType = toFormat => {
+export const formatTypeAndCategory = toFormat => {
     const toReturn = toFormat
     if (toFormat.type === 'Montures') {
         toFormat.type = 'Monture'
     }
-    toReturn.type = COMMON.getKey(toFormat.type)
-    return toReturn
-}
-export const formatCategory = toFormat => {
-    const toReturn = toFormat
-    toReturn.category = COMMON.getCategory(toFormat.type)
-    toReturn.typeOrder = COMMON.getOrder(toFormat.type)
+    const newType = COMMON.getKey(toFormat.type)
+    toReturn.type = newType
+    toReturn.typeOrder = COMMON.getOrder(newType)
+    toReturn.category = COMMON.getCategory(newType)
     return toReturn
 }
 
@@ -402,15 +399,13 @@ export const formatLvlToLevel = toFormat => {
     return toReturn
 }
 
-export function formatFullEquipment(toFormat) {
+export function formatEquipment(toFormat) {
     return removeId(
         formatSetAnkamaId(
-            formatCategory(
-                formatImgUrl(
-                    formatRecipe(
-                        formatStatistics(
-                            formatCharacteristics(formatType(toFormat))
-                        )
+            formatImgUrl(
+                formatRecipe(
+                    formatStatistics(
+                        formatCharacteristics(formatTypeAndCategory(toFormat))
                     )
                 )
             )
